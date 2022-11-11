@@ -27,7 +27,7 @@
 
 //=====================================================================================================================================
 
-struct fileLines
+struct FileLines
 {
     char* lineStart = nullptr;
 
@@ -47,12 +47,12 @@ struct Text
 
 //=====================================================================================================================================
 
-void        textCtor        (Text * text, FILE* const source);
-size_t      fileSize        (FILE* const file);
-void        countInText     (char* buf, char search, size_t* count);
-void        readInBuf       (Text* text, FILE* source);
-void        matchLines      (Text* text);
-void        textDtor        (Text* text); 
+void        TextCtor        (Text * text, FILE* const source);
+size_t      FileSize        (FILE* const file);
+void        CountInText     (char* buf, char search, size_t* count);
+void        ReadInBuf       (Text* text, FILE* source);
+void        MatchLines      (Text* text);
+void        TextDtor        (Text* text); 
 
 //=====================================================================================================================================
 

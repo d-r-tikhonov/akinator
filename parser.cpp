@@ -4,7 +4,7 @@
 
 //=====================================================================================================================================
 
-void textCtor (Text* text, FILE* const source)
+void TextCtor (Text* text, FILE* const source)
 {
     ASSERT (source != nullptr);
     ASSERT (text   != nullptr);
@@ -16,7 +16,7 @@ void textCtor (Text* text, FILE* const source)
 
 //=====================================================================================================================================
 
-void readInBuf (Text* text, FILE* source)
+void ReadInBuf (Text* text, FILE* source)
 {
     ASSERT (text   != nullptr);
     ASSERT (source != nullptr);
@@ -30,7 +30,7 @@ void readInBuf (Text* text, FILE* source)
 
 //=====================================================================================================================================
 
-size_t fileSize (FILE* file)
+size_t FileSize (FILE* file)
 {
     ASSERT (file != nullptr);
 
@@ -52,13 +52,13 @@ size_t fileSize (FILE* file)
 
 //=====================================================================================================================================
 
-void matchLines (Text* text)
+void MatchLines (Text* text)
 {
     size_t   line        = 0;
     size_t   lineStart   = 0;
     
     countInText (text->buffer, '\n', &(text->nLines));
-    text->lines = (fileLines*) calloc (text->nLines + 1, sizeof(fileLines));
+    text->lines = (FileLines*) calloc (text->nLines + 1, sizeof(FileLines));
     
     for (size_t index = 1; index < text->nChar; index++)
     {
@@ -85,7 +85,7 @@ void matchLines (Text* text)
 
 //=====================================================================================================================================
      
-void countInText (char* text, char search, size_t* count)
+void CountInText (char* text, char search, size_t* count)
 {
     size_t index = 0;
 
@@ -101,7 +101,7 @@ void countInText (char* text, char search, size_t* count)
 
 //=====================================================================================================================================
 
-void textDtor(Text* text)
+void TextDtor(Text* text)
 {
     ASSERT (text != nullptr);
 
