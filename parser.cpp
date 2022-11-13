@@ -1,6 +1,6 @@
 //=====================================================================================================================================
 
-#include "filework.h"
+#include "parser.h"
 
 //=====================================================================================================================================
 
@@ -9,30 +9,30 @@ void TextCtor (Text* text, FILE* const source)
     ASSERT (source != nullptr);
     ASSERT (text   != nullptr);
 
-    readInBuff (text, source);
+    ReadInBuffer (text, source);
 
-    matchLines (text);
+    MatchLines (text);
 }
 
 //=====================================================================================================================================
 
-void ReadInBuf (Text* text, FILE* source)
+void ReadInBuffer (Text* text, FILE* source)
 {
     ASSERT (text   != nullptr);
     ASSERT (source != nullptr);
     
-    text->nChar = fileSize (source);
+    text->nChar = FileSize (source);
 
-    text->bufffer = (char*) calloc (text->nChar + 1, sizeof (char));
+    text->buffer = (char*) calloc (text->nChar + 1, sizeof (char));
     
     fread (text->buffer, sizeof(char), text->nChar, source);
 }
 
 //=====================================================================================================================================
 
-size_t FileSize (FILE* file)
+size_t FileSize (FILE* stream)
 {
-    ASSERT (file != nullptr);
+    ASSERT (stream != nullptr);
 
 	size_t curPos = ftell (stream);
 
@@ -57,8 +57,8 @@ void MatchLines (Text* text)
     size_t   line        = 0;
     size_t   lineStart   = 0;
     
-    countInText (text->buffer, '\n', &(text->nLines));
-    text->lines = (FileLines*) calloc (text->nLines + 1, sizeof(FileLines));
+    CountInText (text->buffer, '\n', &(text->nLines));
+    text->lines = (Lines*) calloc (text->nLines + 1, sizeof(Lines));
     
     for (size_t index = 1; index < text->nChar; index++)
     {
@@ -67,7 +67,7 @@ void MatchLines (Text* text)
             (*(text->buffer + index)= '\0');
 
             (text->lines + line)->lineStart = text->buffer + lineStart;
-            (text->lines + line)->lineLen   = index - lineStart;
+            (text->lines + line)->length    = index - lineStart;
             (text->lines + line)->lineIndex = line;
 
             lineStart = index + 1;

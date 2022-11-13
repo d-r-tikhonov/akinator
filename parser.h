@@ -12,26 +12,15 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-//=====================================================================================================================================
-
-#ifndef NDEBUG
-    #define ASSERT(condition)                                                                   \
-        if (!(condition))                                                                       \
-        {                                                                                       \
-            printf ("Assertion FAILED! Error in %s. FILE: %s. LINE: %d. FUNCTION: %s\n",        \
-                    #condition, __FILE__, __LINE__, __PRETTY_FUNCTION__);                       \
-        }
-#else
-    #define ASSERT(condition) ;
-#endif
+#include "errors.h"
 
 //=====================================================================================================================================
 
-struct FileLines
+struct Lines
 {
     char* lineStart = nullptr;
 
-    size_t lineLen   = 0;
+    size_t length   = 0;
     size_t lineIndex = 0;
 };
 
@@ -39,7 +28,7 @@ struct Text
 {
     char* buffer = nullptr;
 
-    fileLines* lines = nullptr;
+    Lines* lines = nullptr;
 
     size_t nChar  = 0;
     size_t nLines = 0;
@@ -48,9 +37,9 @@ struct Text
 //=====================================================================================================================================
 
 void        TextCtor        (Text * text, FILE* const source);
-size_t      FileSize        (FILE* const file);
+size_t      FileSize        (FILE* const stream);
 void        CountInText     (char* buf, char search, size_t* count);
-void        ReadInBuf       (Text* text, FILE* source);
+void        ReadInBuffer    (Text* text, FILE* source);
 void        MatchLines      (Text* text);
 void        TextDtor        (Text* text); 
 
