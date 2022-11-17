@@ -4,6 +4,10 @@
 
 //=====================================================================================================================================
 
+FILE* LogFile = nullptr;
+
+//=====================================================================================================================================
+
 static void clearTree (node_t* root);
 
 //=====================================================================================================================================
@@ -27,23 +31,38 @@ static void clearTree (node_t* root)
 
 //=====================================================================================================================================
 
-void TreeCtor (tree_t* tree)
+int TreeCtor (tree_t* tree)
 {
     ASSERT (tree != nullptr);
 
     tree->root = nullptr;
     tree->size = 0;
+
+    if ((LogFile = fopen ("log.html", "w")) == nullptr)
+    {
+        printf ("Error in function: %s. Error opening LogFile!\n", __func__);
+        return errno;
+    }
 }
 
 //=====================================================================================================================================
 
-void TreeDtor (tree_t* tree)
+int TreeDtor (tree_t* tree)
 {
     ASSERT (tree != nullptr);
 
+    if (tree->size != 0)
+    {
+        clearTree (tree->root);
+    }
+
     tree->size = DeadSize;
 
-    clearTree (tree->root);
+    if ((fclose (LogFile)) != 0)
+    {
+        printf ("Error in function: %s. Error closing LogFile!\n", __func__);
+        return errno;
+    }
 }
 
 //=====================================================================================================================================
@@ -138,6 +157,86 @@ node_t* InsertNode (tree_t* tree, node_t* node, char* item, InsMode insMode)
     tree->size = tree->size + 1;
 
     return newNode;
+}
+
+//=====================================================================================================================================
+
+void NodeDump (tree_t* tree, node_t* node, size_t* nodeCount, FILE* file)
+{
+	ASSERT (tree != nullptr);
+    ASSERT (node != nullptr);
+    ASSERT (file != nullptr);
+	
+	if (*nodeCount > tree->size) return;
+	
+	++(*nodeCount);
+
+	fprintf (file, "\"%s\" [fillcolor=", node->item);
+
+	if	    (*nodeCount == 1)			                        fprintf (file, "\"#C0C0C0\"];\n");
+	else if (node->left == nullptr && node->right == nullptr)   fprintf (file, "\"#98FF98\"];\n");
+	else										                fprintf (file, "\"#FFB2D0\"];\n");
+
+	if (node->left != nullptr)
+	{
+		fprintf (file, "\"%s\" -> \"%s\" [color=\"red\", label=\"YES\"]\n", node->item, node->left->item);
+	}
+
+	if (node->right != nullptr)
+	{
+		fprintf (file, "\"%s\" -> \"%s\" [color=\"blue\", label=\"NO\"]\n", node->item, node->right->item);
+	}
+
+	if (node->left  != nullptr) 
+		NodeDump (tree, node->left,  nodeCount, file);
+
+    if (node->right != nullptr)
+		NodeDump (tree, node->right, nodeCount, file);
+}
+
+//=====================================================================================================================================
+
+void TreeDump (tree_t* tree)
+{   
+    ASSERT (tree != nullptr);
+
+    if (tree->size == 0)
+    {
+        printf ("Error in function: %s. Attempt to call a dump for an empty tree!\n", __func__);
+        return;
+    }
+
+    static unsigned dumpNum = 1;
+
+    static char buf[512] = {0};
+    snprintf (buf, sizeof (buf), "dump%u.dot", dumpNum);
+
+    FILE* dotFile = fopen (buf, "w");
+
+    fprintf (LogFile, "\n<hr>\n");
+   
+    fprintf (dotFile, "digraph G{\n");
+    fprintf (dotFile, "node [color=black, shape=box, style=\"rounded, filled\"];\n");
+
+    fprintf (dotFile, "size [fillcolor=\"#FFFEB6\", "
+                     "label=\"SIZE = %lu\"];\n",
+                      tree->size);
+    
+	size_t nodeCount = 0;
+
+	NodeDump (tree, tree->root, &nodeCount, dotFile);
+
+    fprintf (dotFile, "}\n");
+    
+    fclose (dotFile);
+
+    snprintf (buf, sizeof (buf), "dot -Tsvg dump%u.dot -o dump%u.svg", dumpNum, dumpNum);
+    system (buf);
+	
+	fprintf (LogFile, "<center""><h1"">TREE DUMP - INVOCATION %u</h1"">""</center"">\n", dumpNum);
+    fprintf (LogFile, "<img width=\"1920\" height=\"1080\" src=\"dump%u.svg\"/>\n", dumpNum);
+
+    dumpNum++;
 }
 
 //=====================================================================================================================================

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdarg.h>
+#include <errno.h>
 
 #include "errors.h"
 
@@ -30,7 +31,7 @@ struct node_t
 struct tree_t
 {
     node_t* root;
-    
+
     size_t size;
 };
 
@@ -44,13 +45,15 @@ enum InsMode
 
 //=====================================================================================================================================
 
-void    TreeCtor            (tree_t* tree);
-void    TreeDtor            (tree_t* tree);
+int     TreeCtor            (tree_t* tree);
+int     TreeDtor            (tree_t* tree);
 bool    isTreeEmpty         (tree_t* tree);
 bool    isTreeDestructed    (tree_t* tree);
 node_t* CreateNode          (char* item);
 node_t* InsertNode          (tree_t* tree, node_t* node, char* item, InsMode insMode);
 bool    NodeRemove          (tree_t* tree, node_t* node);
+void    NodeDump            (tree_t* tree, node_t* node, size_t* nodeCount, FILE* file);
+void    TreeDump            (tree_t* tree);
 
 //=====================================================================================================================================
 
