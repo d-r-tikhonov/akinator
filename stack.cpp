@@ -7,7 +7,7 @@
 static const elem_t Poison          = (elem_t) 0xFEE1DEAD;
 static const size_t StackMultiplier =                   2;
 static const size_t StackInitValue  =                  10;
-static const elem_t nullValue       =                 'u';
+static const elem_t nullValue       =                   0;
 static FILE* logFile                =              stdout;
 
 //=====================================================================================================================================
@@ -147,7 +147,7 @@ void StackDump (stack_t* const stk)
         }
         else 
         {
-            fprintf (logFile, "| stack[%7u] = %18X |\n", i, stk->data[i]);
+            fprintf (logFile, "| stack[%7u] = %18p |\n", i, stk->data[i]);
         }
     }
 
