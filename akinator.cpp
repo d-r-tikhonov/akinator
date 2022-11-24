@@ -53,7 +53,7 @@ int SelectMode (void)
 
         if (strchr ("geq", mode) == 0)
         {
-            printf ("You have entered an incorrect character! Enter the character correctly!\n");
+            printf ("You have entered an incorrect symbol! Enter the symbol correctly!\n");
             continue;
         }
         else
@@ -224,7 +224,7 @@ int AkinatorGuess (tree_t* tree)
     {
         StackPush (&stk, currentNode);
 
-        printf ("Question: %s. Enter [y] if the answer is YES or [n] if the answer is NO: ", currentNode->item);
+        printf ("Question: %s?. Enter [y] if the answer is YES or [n] if the answer is NO: ", currentNode->item);
 
         while ((userAns = getchar ()) != EOF)
         {

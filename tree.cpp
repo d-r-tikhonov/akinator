@@ -183,18 +183,19 @@ void NodeDump (tree_t* tree, node_t* node, size_t* nodeCount, FILE* file)
 
 	fprintf (file, "\"%s\" [fillcolor=", node->item);
 
-	if	    (*nodeCount == 1)			                        fprintf (file, "\"#C0C0C0\"];\n");
-	else if (node->left == nullptr && node->right == nullptr)   fprintf (file, "\"#98FF98\"];\n");
-	else										                fprintf (file, "\"#FFB2D0\"];\n");
+	if (node->left == nullptr && node->right == nullptr)   
+        fprintf (file, "\"lightgreen\"];\n");
+	else										                
+        fprintf (file, "\"#7B68EE\"];\n");
 
 	if (node->left != nullptr)
 	{
-		fprintf (file, "\"%s\" -> \"%s\" [color=\"red\", label=\"YES\"]\n", node->item, node->left->item);
+		fprintf (file, "\"%s\" -> \"%s\" [fontname = \"Aqum\", color=\"red\", label=\"YES\"]\n", node->item, node->left->item);
 	}
 
 	if (node->right != nullptr)
 	{
-		fprintf (file, "\"%s\" -> \"%s\" [color=\"blue\", label=\"NO\"]\n", node->item, node->right->item);
+		fprintf (file, "\"%s\" -> \"%s\" [fontname = \"Aqum\", color=\"blue\", label=\"NO\"]\n", node->item, node->right->item);
 	}
 
 	if (node->left  != nullptr) 
@@ -226,9 +227,9 @@ void TreeDump (tree_t* tree)
     fprintf (LogFile, "\n<hr>\n");
    
     fprintf (dotFile, "digraph G{\n");
-    fprintf (dotFile, "node [color=black, shape=box, style=\"rounded, filled\"];\n");
+    fprintf (dotFile, "node [color=black, shape=box, style=\"rounded, filled\", fontname = \"Aqum\"];\n");
 
-    fprintf (dotFile, "size [fillcolor=\"#FFFEB6\", "
+    fprintf (dotFile, "size [fillcolor=\"#FFD700\", "
                      "label=\"SIZE = %lu\"];\n",
                       tree->size);
     
