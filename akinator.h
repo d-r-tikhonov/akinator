@@ -20,6 +20,9 @@ int         ReadTree            (Text* database, tree_t* tree);
 int         AkinatorGuess       (tree_t* tree);
 void        DatabaseDtor        (tree_t* treeDatabase);
 void        ClearInputBuffer    (void);
+int         SaveTempData        (node_t* root, FILE* stream, size_t tabCount);
+int         UpdateTempDatabase  (node_t* currentNode);
+int         UpdateDatabase      (tree_t* tree);
 
 //=====================================================================================================================================
 

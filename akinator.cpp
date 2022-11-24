@@ -11,7 +11,7 @@ int main (void)
 
     int mode = 0;
 
-    while ((mode = SelectMode ()) != 'q')
+    while ((mode = SelectMode ()) != 'q' && mode != 'e')
     {
         switch (mode)
         {
@@ -23,6 +23,12 @@ int main (void)
             printf ("Error in function: %s. Error incorrect mode!\n", __func__);
             break;
         }
+    }
+
+    if (mode == 'e')
+    {
+        UpdateDatabase (treeDatabase);
+        printf ("Bye! Come again!");
     }
 
     DatabaseDtor (treeDatabase);
@@ -38,13 +44,14 @@ int SelectMode (void)
 
     printf ("Select the program usage mode:\n"
             "Guess the character - [g]\n"
-            "Quit the program - [q]\n");
+            "Exit the program by saving the changes - [e]\n"
+            "Quit the program without saving - [q]\n");
     
     while ((mode = getchar ()) != EOF)
     {
         ClearInputBuffer ();
 
-        if (strchr ("gq", mode) == 0)
+        if (strchr ("geq", mode) == 0)
         {
             printf ("You have entered an incorrect character! Enter the character correctly!\n");
             continue;
@@ -259,6 +266,8 @@ int AkinatorGuess (tree_t* tree)
         return 0;
     }
 
+    UpdateTempDatabase (currentNode);
+
     StackDtor (&stk);
 
     return 0;
@@ -280,6 +289,121 @@ void ClearInputBuffer (void)
     {
         continue;
     }
+}
+
+//=====================================================================================================================================
+
+int SaveTempData (node_t* root, FILE* stream, size_t tabCount)
+{
+    ASSERT (root != nullptr);
+    ASSERT (stream != nullptr);
+
+    for (size_t index = 0; index < tabCount; index++)
+    {
+        fputc ('\t', stream);
+    }
+
+    fprintf (stream, "{ \"");
+    fprintf (stream, "%s\"", root->item);
+
+    if (root->left == nullptr && root->right == nullptr)
+    {
+        fprintf (stream, "}");
+    }
+
+    fputc ('\n', stream);
+
+    if (root->left != nullptr)
+        SaveTempData (root->left, stream, tabCount + 1);
+    
+    if (root->right != nullptr)
+        SaveTempData (root->right, stream, tabCount + 1);
+
+    if (root->left != nullptr && root->right != nullptr)
+    {
+        for (size_t index = 0; index < tabCount; index++)
+        {
+            fputc ('\t', stream);
+        }
+
+        fprintf (stream, " }\n");
+    }
+
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int UpdateTempDatabase (node_t* currentNode)
+{
+    if (currentNode == nullptr)
+    {
+        printf ("Error in function: %s. Condition:  currentNode == nullptr\n", __func__);
+        return -1;
+    }
+
+    printf ("Damn, I lost! And who was it?\n");
+
+    char newCharacter[MaxSize] = "";
+    fgets (newCharacter, MaxSize - 1, stdin);
+
+    size_t lastSymbol = strlen (newCharacter) - 1;
+    if (newCharacter[lastSymbol] == '\n')
+    {
+        newCharacter[lastSymbol] = '\0';
+    }
+
+    node_t* newLeft  = CreateNode (newCharacter);
+    node_t* newRight = CreateNode (currentNode->item);
+
+    printf ("How does %s differ from %s? Write an answer: ", newLeft->item, currentNode->item);
+
+    char difference[MaxSize] = "";
+    fgets (difference, MaxSize - 1, stdin);
+
+    lastSymbol = strlen (difference) - 1;
+
+    if (difference[lastSymbol] == '\n')
+    {
+        difference[lastSymbol] = '\0';
+    }
+
+    strncpy (currentNode->item, difference, MaxSize - 1);
+
+    currentNode->left = newLeft;
+    currentNode->right = newRight;
+
+    printf ("Ha ha! I've become smarter, leather bag!");
+
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int UpdateDatabase (tree_t* tree)
+{
+    if (tree == nullptr)
+    {
+        printf ("Error in function: %s. Condition: tree == nullptr!\n", __func__);
+        return -1;
+    }
+
+    FILE* dataBase = fopen ("akinator.database", "w");
+    if (dataBase == nullptr)
+    {
+        printf ("Error in function: %s. Error opening the database!\n", __func__);
+        return -1;
+    }
+
+    SaveTempData (tree->root, dataBase, 1);
+
+    if (fclose (dataBase) != 0)
+    {
+        printf ("Error in function: %s. Error closing the database!\n", __func__);
+        return -1;
+    }
+    
+    return 0;
 }
 
 //=====================================================================================================================================
