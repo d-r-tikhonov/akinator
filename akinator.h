@@ -18,6 +18,7 @@ tree_t*     DataDownload        (void);
 int         CreateNodeItem      (char* item, const char* data);
 int         ReadTree            (Text* database, tree_t* tree);
 int         AkinatorGuess       (tree_t* tree);
+void        DatabaseDtor        (tree_t* treeDatabase);
 
 //=====================================================================================================================================
 

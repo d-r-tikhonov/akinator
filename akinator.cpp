@@ -7,6 +7,7 @@
 int main (void)
 {
     tree_t* treeDatabase = DataDownload ();
+    TreeDump (treeDatabase);
 
     int mode = 0;
 
@@ -24,8 +25,7 @@ int main (void)
         }
     }
 
-    TreeDtor (treeDatabase);
-    free (treeDatabase);
+    DatabaseDtor (treeDatabase);
 
     return 0;
 }
@@ -74,8 +74,12 @@ tree_t* DataDownload (void)
     FILE* dataFile = fopen ("akinator.database", "r");
     ASSERT (dataFile != nullptr);
 
+    printf ("HERE1\n");
+
     tree_t* tree = (tree_t*) calloc (1, sizeof (tree_t));
     TreeCtor (tree);
+
+    printf ("HERE2\n");
 
     Text dataBase = {};
     TextCtor (&dataBase, dataFile);
@@ -83,10 +87,17 @@ tree_t* DataDownload (void)
     if (fclose (dataFile) != 0)
     {
         printf ("Error in function: %s. Error closing the dataFile!\n", __func__);
+    }
+
+    printf ("HERE3\n");
+
+    if (ReadTree (&dataBase, tree) != 0)
+    {
+        printf ("Error in function: %s. Error reading the tree!\n", __func__);
         return nullptr;
     }
 
-    ReadTree (&dataBase, tree);
+    printf ("HERE4\n");
 
     TextDtor (&dataBase);
 
@@ -122,6 +133,8 @@ int ReadTree (Text* database, tree_t* tree)
     ASSERT (database != nullptr);
     ASSERT (tree != nullptr);
 
+    printf ("HERE11\n");
+
     stack_t stk = {};
     StackCtor (&stk);
 
@@ -143,6 +156,8 @@ int ReadTree (Text* database, tree_t* tree)
     InsMode currentMode = LEFT;
     node_t* currentNode = InsertNode (tree, tree->root, item, currentMode);
 
+    printf ("HERE12\n");
+
     if (strchr (open, '}') != nullptr)
     {
         StackDtor (&stk);
@@ -151,18 +166,20 @@ int ReadTree (Text* database, tree_t* tree)
 
     for (size_t index = 1; index < database->nLines; index++)
     {
+        char varItem[MaxSize] = "";
+
         open = strchr (database->lines[index].lineStart, '{');
         if (open != nullptr)
         {
             StackPush (&stk, currentNode);
 
-            if (CreateNodeItem (item, open + 3) != 0)
+            if (CreateNodeItem (varItem, open + 3) != 0)
             {       
                 printf ("Error in function: %s. Error in the database!\n", __func__);
                 return -1;
             }
 
-            currentNode = InsertNode (tree, currentNode, item, currentMode);
+            currentNode = InsertNode (tree, currentNode, varItem, currentMode);
 
             if (strchr (open, '}') != nullptr)
             {
@@ -182,6 +199,11 @@ int ReadTree (Text* database, tree_t* tree)
         {
             currentNode = StackPop (&stk);
             currentMode = RIGHT;
+        }
+        else
+        {
+            printf ("Error in function: %s. Error in the database!\n", __func__);
+            return -1;
         }
     }
 
@@ -253,6 +275,14 @@ int AkinatorGuess (tree_t* tree)
     StackDtor (&stk);
 
     return 0;
+}
+
+//=====================================================================================================================================
+
+void DatabaseDtor (tree_t* treeDatabase)
+{
+    TreeDtor (treeDatabase);
+    free (treeDatabase);
 }
 
 //=====================================================================================================================================
