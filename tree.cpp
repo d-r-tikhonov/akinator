@@ -99,13 +99,8 @@ node_t* CreateNode (char* item)
         return nullptr;
     }
 
-    printf ("NewNode: %p\n", newNode);
-    printf ("newNode->item: %p\n", newNode->item);
-
 	newNode->item = (char*) calloc (MaxSize, sizeof (char));
     strcpy (newNode->item, item);
-    printf ("Item: %s\n", item);
-    printf ("newNode->item: %s\n", newNode->item);
 
     newNode->left  = nullptr;
     newNode->right = nullptr;
@@ -137,11 +132,14 @@ bool NodeRemove (tree_t* tree, node_t* node)
 node_t* InsertNode (tree_t* tree, node_t* node, char* item, InsMode insMode)
 {
     ASSERT (tree != nullptr);
-    ASSERT (node != nullptr);
-    ASSERT (tree->root != nullptr);
+
+    if (tree->size != 0 && node == nullptr && tree->root == nullptr)
+    {
+        printf ("Error in function: %s. The tree is incorrect!\n", __func__);
+        return nullptr;
+    }
 
     node_t* newNode = CreateNode (item);
-    printf ("INS: %s\n", newNode->item);
 
     if (tree->root == node && tree->size == 0)
     {

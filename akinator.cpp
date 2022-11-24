@@ -42,10 +42,7 @@ int SelectMode (void)
     
     while ((mode = getchar ()) != EOF)
     {
-        while (getchar () != '\n')
-        {
-            continue;
-        }
+        ClearInputBuffer ();
 
         if (strchr ("gq", mode) == 0)
         {
@@ -74,12 +71,8 @@ tree_t* DataDownload (void)
     FILE* dataFile = fopen ("akinator.database", "r");
     ASSERT (dataFile != nullptr);
 
-    printf ("HERE1\n");
-
     tree_t* tree = (tree_t*) calloc (1, sizeof (tree_t));
     TreeCtor (tree);
-
-    printf ("HERE2\n");
 
     Text dataBase = {};
     TextCtor (&dataBase, dataFile);
@@ -89,15 +82,11 @@ tree_t* DataDownload (void)
         printf ("Error in function: %s. Error closing the dataFile!\n", __func__);
     }
 
-    printf ("HERE3\n");
-
     if (ReadTree (&dataBase, tree) != 0)
     {
         printf ("Error in function: %s. Error reading the tree!\n", __func__);
         return nullptr;
     }
-
-    printf ("HERE4\n");
 
     TextDtor (&dataBase);
 
@@ -133,8 +122,6 @@ int ReadTree (Text* database, tree_t* tree)
     ASSERT (database != nullptr);
     ASSERT (tree != nullptr);
 
-    printf ("HERE11\n");
-
     stack_t stk = {};
     StackCtor (&stk);
 
@@ -155,8 +142,6 @@ int ReadTree (Text* database, tree_t* tree)
 
     InsMode currentMode = LEFT;
     node_t* currentNode = InsertNode (tree, tree->root, item, currentMode);
-
-    printf ("HERE12\n");
 
     if (strchr (open, '}') != nullptr)
     {
@@ -236,9 +221,11 @@ int AkinatorGuess (tree_t* tree)
 
         while ((userAns = getchar ()) != EOF)
         {
+            ClearInputBuffer ();
+
             if (strchr ("yn", userAns) == nullptr)
             {
-                printf ("Enter the symbols correctly!");
+                printf ("Enter the symbols correctly! Enter [y] or [n]: ");
             }
             else
             {
@@ -265,7 +252,7 @@ int AkinatorGuess (tree_t* tree)
 
     if (userAns == 'y')
     {
-        printf ("Ho-ho-ho! I've won again, leather bag! You made a wish %s", currentNode->item);
+        printf ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n", currentNode->item);
 
         StackDtor (&stk);
 
@@ -283,6 +270,16 @@ void DatabaseDtor (tree_t* treeDatabase)
 {
     TreeDtor (treeDatabase);
     free (treeDatabase);
+}
+
+//=====================================================================================================================================
+
+void ClearInputBuffer (void)
+{
+    while (getchar () != '\n')
+    {
+        continue;
+    }
 }
 
 //=====================================================================================================================================
