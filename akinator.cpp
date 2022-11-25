@@ -18,14 +18,22 @@ int main (void)
         switch (mode)
         {
         case 'g':
+            printf ("\n");
             AkinatorGuess (treeDatabase);
             break;
 
         case 'd':
-            GiveDefiniton (treeDatabase);
+            printf ("\n");
+            DefineCharacter (treeDatabase);
+            break;
+
+        case 'c':
+            printf ("\n");
+            CompareCharacters (treeDatabase);
             break;
         
         default:
+            printf ("\n");
             printf ("Error in function: %s. Error incorrect mode!\n", __func__);
             break;
         }
@@ -36,6 +44,8 @@ int main (void)
         UpdateDatabase (treeDatabase);
         printf ("Bye! Come again!");
     }
+
+    TreeDump (treeDatabase);
 
     DatabaseDtor (treeDatabase);
 
@@ -48,9 +58,9 @@ int SelectMode (void)
 {
     int mode = 0;
 
-    printf ("Select the program usage mode:\n"
-            "Guess the character - [g]\n"
+    printf ("Guess the character - [g]\n"
             "Get character definition - [d]\n"
+            "Compare characters - [c]\n"
             "Exit the program by saving the changes - [e]\n"
             "Quit the program without saving - [q]\n");
     
@@ -58,7 +68,7 @@ int SelectMode (void)
     {
         ClearInputBuffer ();
 
-        if (strchr ("gdeq", mode) == 0)
+        if (strchr ("gdceq", mode) == 0)
         {
             printf ("You have entered an incorrect symbol! Enter the symbol correctly!\n");
             continue;
@@ -484,7 +494,7 @@ int FindCharacter (char* character, tree_t* tree, node_t* node, size_t* count, s
 
 //=====================================================================================================================================
 
-int GiveDefiniton (tree_t* tree)
+int DefineCharacter (tree_t* tree)
 {
     if (tree == nullptr)
     {
@@ -545,10 +555,7 @@ int PrintDefinition (stack_t* stk)
     stack_t reverseStk = {};
     StackCtor (&reverseStk);
 
-    while (stk->size != 0)
-    {
-        StackPush (&reverseStk, StackPop (stk));
-    }
+    ReverseStack (&reverseStk, stk);
 
     while (reverseStk.size != 0)
     {
@@ -573,6 +580,147 @@ int PrintDefinition (stack_t* stk)
 
     StackDtor (&reverseStk);
     
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int CompareCharacters (tree_t* tree)
+{
+    ASSERT (tree != nullptr);
+
+    printf ("Enter the name of the first character: ");
+
+    char firstCharacter[MaxSize] = "";
+    ReadCharacter (firstCharacter);
+
+    stack_t firstDefinitions = {};
+    StackCtor (&firstDefinitions);
+
+    if (FindDefinitions (firstCharacter, tree, tree->root, &firstDefinitions) != 0)
+    {
+        printf ("Error in function: %s. Error in character definition!\n\n", __func__);
+
+        StackDtor (&firstDefinitions);
+        
+        return -1;
+    }
+
+    printf ("Enter the name of the second character: ");
+    char secondCharacter[MaxSize] = "";
+    ReadCharacter (secondCharacter);
+
+    stack_t secondDefinitions = {};
+    StackCtor (&secondDefinitions);
+
+    if (FindDefinitions (secondCharacter, tree, tree->root, &secondDefinitions) != 0)
+    {
+        printf ("Error in function: %s. Error in character definition!\n\n", __func__);
+
+        StackDtor (&secondDefinitions);
+
+        return -1;
+    }
+
+    bool common = 0;
+
+    printf ("Common properties: ");
+
+    while (firstDefinitions.size != 0 && secondDefinitions.size != 0)
+    {
+        node_t* firstNode  = StackPop (&firstDefinitions);
+        node_t* secondNode = StackPop (&secondDefinitions);
+
+        node_t* firstAns  = StackPop (&firstDefinitions);
+        node_t* secondAns = StackPop (&secondDefinitions);
+
+        if (firstAns == secondAns && firstNode == secondNode)
+        {
+            if (common != 0)
+            {
+                printf (", ");
+            }
+
+            common = 1;
+
+            if (firstAns == nullptr)
+                printf ("not ");
+            
+            printf ("%s", firstNode->item);
+        }
+    }
+
+    if (common == 0)
+    {
+        printf ("the characters do not have common properties. It is impossible to compare them!");
+    }
+
+    printf ("\n\n");
+
+    StackDtor (&firstDefinitions);
+    StackDtor (&secondDefinitions);
+
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int ReadCharacter (char* character)
+{
+    ASSERT (character != nullptr);
+
+    fgets (character, MaxSize - 1, stdin);
+
+    size_t lastSymbol = strlen (character) - 1;
+    if (character[lastSymbol] == '\n')
+    {
+        character[lastSymbol] = '\0';
+    }
+
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int ReverseStack (stack_t* reverseStk, stack_t* tempStk)
+{
+    while (tempStk->size != 0)
+    {
+        StackPush (reverseStk, StackPop (tempStk));
+    }
+
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int FindDefinitions (char* character, tree_t* tree, node_t* node, stack_t* definitions)
+{
+    ASSERT (character       != nullptr);
+    ASSERT (tree            != nullptr);
+    ASSERT (node            != nullptr);
+    ASSERT (definitions     != nullptr);
+
+    stack_t temp = {};
+    StackCtor (&temp);
+
+    size_t count = 0;
+
+    int findResult = FindCharacter (character, tree, tree->root, &count, &temp);
+    if (findResult != FOUND)
+    {
+        StackDtor (&temp);
+        printf ("There is no such character in the database!\n");
+        return -1;
+    }
+
+    StackPop (&temp);
+    StackPop (&temp);
+
+    ReverseStack (definitions, &temp);
+
+    StackDtor (&temp);
+
     return 0;
 }
 

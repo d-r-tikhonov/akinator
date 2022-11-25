@@ -32,8 +32,12 @@ int         SaveTempData        (node_t* root, FILE* stream, size_t tabCount);
 int         UpdateTempDatabase  (node_t* currentNode);
 int         UpdateDatabase      (tree_t* tree);
 int         PrintDefinition     (stack_t* stk);
-int         GiveDefiniton       (tree_t* tree);
+int         DefineCharacter     (tree_t* tree);
 int         FindCharacter       (char* character, tree_t* tree, node_t* node, size_t* count, stack_t* stk);
+int         CompareCharacters   (tree_t* tree);
+int         ReverseStack        (stack_t* reverseStk, stack_t* tempStk);
+int         ReadCharacter       (char* character);
+int         FindDefinitions     (char* character, tree_t* tree, node_t* node, stack_t* definitions);
 
 //=====================================================================================================================================
 
