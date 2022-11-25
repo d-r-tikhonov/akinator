@@ -513,6 +513,8 @@ int GiveDefiniton (tree_t* tree)
 
     int findResult = FindCharacter (userCharacter, tree, tree->root, &count, &stk);
 
+    StackDump (&stk);
+
     switch (findResult)
     {
     case FOUND:
@@ -547,7 +549,7 @@ int PrintDefinition (stack_t* stk)
     stack_t reverseStk = {};
     StackCtor (&reverseStk);
 
-    while (stk != 0)
+    while (stk->size != 0)
     {
         StackPush (&reverseStk, StackPop (stk));
     }
