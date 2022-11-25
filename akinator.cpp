@@ -2,8 +2,6 @@
 
 #include "akinator.h"
 
-#include <TXLib.h>
-
 //=====================================================================================================================================
 
 int main (void)
@@ -512,8 +510,6 @@ int GiveDefiniton (tree_t* tree)
     size_t count = 0;
 
     int findResult = FindCharacter (userCharacter, tree, tree->root, &count, &stk);
-
-    StackDump (&stk);
 
     switch (findResult)
     {

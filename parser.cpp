@@ -37,13 +37,14 @@ size_t FileSize (FILE* stream)
 	size_t curPos = ftell (stream);
 
 	fseek (stream, 0L, SEEK_END);
-	size_t size = ftell (stream);
 
-	if (size == -1)
+	if (ftell (stream) == -1)
     {
         printf ("Error in function: %s. Error size = -1!\n", __func__);
-        return -1;
+        return errno;
     }
+
+    size_t size = ftell (stream);
 
 	fseek (stream, curPos, SEEK_SET);
 

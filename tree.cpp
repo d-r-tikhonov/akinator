@@ -43,6 +43,8 @@ int TreeCtor (tree_t* tree)
         printf ("Error in function: %s. Error opening LogFile!\n", __func__);
         return errno;
     }
+
+    return 0;
 }
 
 //=====================================================================================================================================
@@ -63,6 +65,8 @@ int TreeDtor (tree_t* tree)
         printf ("Error in function: %s. Error closing LogFile!\n", __func__);
         return errno;
     }
+
+    return 0;
 }
 
 //=====================================================================================================================================
@@ -230,7 +234,7 @@ void TreeDump (tree_t* tree)
     fprintf (dotFile, "node [color=black, shape=box, style=\"rounded, filled\", fontname = \"Aqum\"];\n");
 
     fprintf (dotFile, "size [fillcolor=\"#FFD700\", "
-                     "label=\"SIZE = %lu\"];\n",
+                     "label=\"SIZE = %u\"];\n",
                       tree->size);
     
 	size_t nodeCount = 0;
