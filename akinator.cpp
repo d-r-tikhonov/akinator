@@ -2,6 +2,8 @@
 
 #include "akinator.h"
 
+#include <TXLib.h>
+
 //=====================================================================================================================================
 
 int main (void)
@@ -11,12 +13,18 @@ int main (void)
 
     int mode = 0;
 
+    printf ("Hello world! That's what I can do: \n");
+
     while ((mode = SelectMode ()) != 'q' && mode != 'e')
     {
         switch (mode)
         {
         case 'g':
             AkinatorGuess (treeDatabase);
+            break;
+
+        case 'd':
+            GiveDefiniton (treeDatabase);
             break;
         
         default:
@@ -44,6 +52,7 @@ int SelectMode (void)
 
     printf ("Select the program usage mode:\n"
             "Guess the character - [g]\n"
+            "Get character definition - [d]\n"
             "Exit the program by saving the changes - [e]\n"
             "Quit the program without saving - [q]\n");
     
@@ -51,7 +60,7 @@ int SelectMode (void)
     {
         ClearInputBuffer ();
 
-        if (strchr ("geq", mode) == 0)
+        if (strchr ("gdeq", mode) == 0)
         {
             printf ("You have entered an incorrect symbol! Enter the symbol correctly!\n");
             continue;
@@ -259,7 +268,7 @@ int AkinatorGuess (tree_t* tree)
 
     if (userAns == 'y')
     {
-        printf ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n", currentNode->item);
+        printf ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n\n", currentNode->item);
 
         StackDtor (&stk);
 
@@ -402,6 +411,169 @@ int UpdateDatabase (tree_t* tree)
         printf ("Error in function: %s. Error closing the database!\n", __func__);
         return -1;
     }
+    
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int FindCharacter (char* character, tree_t* tree, node_t* node, size_t* count, stack_t* stk)
+{
+    ASSERT (character   != nullptr);
+    ASSERT (tree        != nullptr);
+    ASSERT (node        != nullptr);
+    ASSERT (count       != nullptr);
+    ASSERT (stk         != nullptr);
+
+    ASSERT (*count < tree->size);
+
+    *count = *count + 1;
+
+    StackPush (stk, node);
+
+    if (node->left == nullptr && node->right == nullptr)
+    {
+        if (strcmp (node->item, character) == 0)
+        {
+            StackPush (stk, node);
+            return FOUND;
+        }
+        else
+        {
+            StackPush (stk, nullptr);
+            return FOUND;
+        }
+    }
+
+    if (node->left != nullptr)
+    {
+        StackPush (stk, node);
+        FindCharacter (character, tree, node->left, count, stk);
+    }
+
+    node_t* prevNode = StackPop (stk);
+    if (prevNode != nullptr)
+    {
+        StackPush (stk, prevNode);
+
+        return FOUND;
+    }
+
+    StackPop (stk);
+    StackPop (stk);
+
+    if (node->right != nullptr) 
+    {
+        StackPush (stk, nullptr);
+
+        FindCharacter (character, tree, node->right, count, stk);
+    }
+
+    prevNode = StackPop (stk);
+    if (prevNode != nullptr)
+    {
+        StackPush (stk, prevNode);
+        return FOUND;
+    }
+
+    StackPop (stk);
+    StackPop (stk);
+
+    StackPush(stk, nullptr);
+
+    return EMPTY;
+}
+
+//=====================================================================================================================================
+
+int GiveDefiniton (tree_t* tree)
+{
+    if (tree == nullptr)
+    {
+        printf ("Error in function: %s. Condition: tree == nullptr!\n", __func__);
+        return -1;
+    }
+
+    printf ("Who do you want to know about?: ");
+
+    char userCharacter[MaxSize] = "";
+
+    fgets (userCharacter, MaxSize - 1, stdin);
+
+    size_t lastSymbol = strlen (userCharacter) - 1;
+    if (userCharacter[lastSymbol] == '\n')
+    {
+        userCharacter[lastSymbol] = '\0';
+    }
+
+    stack_t stk = {};
+    StackCtor (&stk);
+
+    size_t count = 0;
+
+    int findResult = FindCharacter (userCharacter, tree, tree->root, &count, &stk);
+
+    switch (findResult)
+    {
+    case FOUND:
+        PrintDefinition (&stk);
+        break;
+    
+    case EMPTY:
+        printf ("I do not know who this is!\n\n");
+        break;
+    
+    default:
+        printf ("Error in function: %s. Error when searching for a character!\n", __func__);
+        break;
+    }
+
+    StackDtor (&stk);
+
+    return 0;
+}
+
+//=====================================================================================================================================
+
+int PrintDefinition (stack_t* stk)
+{
+    ASSERT (stk != nullptr);
+
+    StackPop (stk);
+
+    node_t* character = StackPop (stk);
+    printf ("%s is ", character->item);
+
+    stack_t reverseStk = {};
+    StackCtor (&reverseStk);
+
+    while (stk != 0)
+    {
+        StackPush (&reverseStk, StackPop (stk));
+    }
+
+    while (reverseStk.size != 0)
+    {
+        node_t* currentNode = StackPop (&reverseStk);
+
+        if (StackPop (&reverseStk) == nullptr)
+        {
+            printf ("not ");
+        }
+
+        printf ("%s", currentNode->item);
+        
+        if (reverseStk.size != 0)
+        {
+            printf (", ");
+        }
+        else
+        {
+            printf ("\n");
+        }
+    }
+
+    StackDtor (&reverseStk);
     
     return 0;
 }

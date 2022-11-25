@@ -13,6 +13,14 @@
 
 //=====================================================================================================================================
 
+enum FindResult
+{
+    FOUND = 0,
+    EMPTY = -1
+};
+
+//=====================================================================================================================================
+
 int         SelectMode          (void);
 tree_t*     DataDownload        (void);
 int         CreateNodeItem      (char* item, const char* data);
@@ -23,6 +31,9 @@ void        ClearInputBuffer    (void);
 int         SaveTempData        (node_t* root, FILE* stream, size_t tabCount);
 int         UpdateTempDatabase  (node_t* currentNode);
 int         UpdateDatabase      (tree_t* tree);
+int         PrintDefinition     (stack_t* stk);
+int         GiveDefiniton       (tree_t* tree);
+int         FindCharacter       (char* character, tree_t* tree, node_t* node, size_t* count, stack_t* stk);
 
 //=====================================================================================================================================
 
