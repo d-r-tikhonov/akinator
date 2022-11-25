@@ -390,7 +390,7 @@ int UpdateTempDatabase (node_t* currentNode)
     currentNode->left = newLeft;
     currentNode->right = newRight;
 
-    printf ("Ha ha! I've become smarter, leather bag!");
+    printf ("Ha ha! I've become smarter, leather bag!\n\n");
 
     return 0;
 }
