@@ -1,10 +1,12 @@
 //=====================================================================================================================================
 
-#define TX_USE_SPEAK
+// #define TX_USE_SPEAK
 
 //=====================================================================================================================================
 
-#include <TXLib.h>
+#ifdef TX_USE_SPEAK
+    #include <TXLib.h>
+#endif
 
 #include "akinator.h"
 
@@ -762,7 +764,15 @@ int SpeakAndPrint (const char* str...)
 
     printf ("%s", message);
 
-    txSpeak (message);
+    #ifdef TX_USE_SPEAK
+        txSpeak (message);
+    #else
+        char cmd[MaxSize] = "";
+
+        sprintf (cmd, ".\\eSpeak\\command_line\\espeak.exe \"%s\"", message);
+
+        system (cmd);
+    #endif
 
     return 0;
 }
