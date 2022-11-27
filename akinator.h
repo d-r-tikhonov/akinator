@@ -9,7 +9,6 @@
 #include "parser.h"
 #include "stack.h"
 #include "errors.h"
-#include "config.h"
 
 //=====================================================================================================================================
 
@@ -29,7 +28,7 @@ int         AkinatorGuess       (tree_t* tree);
 void        DatabaseDtor        (tree_t* treeDatabase);
 void        ClearInputBuffer    (void);
 int         SaveTempData        (node_t* root, FILE* stream, size_t tabCount);
-int         UpdateTempDatabase  (node_t* currentNode);
+int         UpdateTempDatabase  (tree_t* treeDatabase, node_t* currentNode);
 int         UpdateDatabase      (tree_t* tree);
 int         PrintDefinition     (stack_t* stk);
 int         DefineCharacter     (tree_t* tree);
@@ -38,7 +37,7 @@ int         CompareCharacters   (tree_t* tree);
 int         ReverseStack        (stack_t* reverseStk, stack_t* tempStk);
 int         ReadCharacter       (char* character);
 int         FindDefinitions     (char* character, tree_t* tree, node_t* node, stack_t* definitions);
-void        SpeakAndPrint       (const char* str...);
+int         SpeakAndPrint       (const char* str...);
 
 //=====================================================================================================================================
 

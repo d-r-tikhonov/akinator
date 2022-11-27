@@ -80,7 +80,7 @@ void StackDtor (stack_t* const stk)
     ASSERT (stk != nullptr);
 
     #ifdef CANARY_PROTECT
-        free ((canary_t*) stk->data - sizeof (canary_t)); //BAG
+        free(((char*) stk->data - sizeof(canary_t))); 
     #else
         free (stk->data);
     #endif

@@ -1,5 +1,11 @@
 //=====================================================================================================================================
 
+#define TX_USE_SPEAK
+
+//=====================================================================================================================================
+
+#include <TXLib.h>
+
 #include "akinator.h"
 
 //=====================================================================================================================================
@@ -11,10 +17,12 @@ int main (void)
 
     int mode = 0;
 
-    SpeakAndPrint ("Hello world! That's what I can do: \n");
+    printf ("Hello world! That's what I can do: \n");
 
     while ((mode = SelectMode ()) != 'q' && mode != 'e')
     {
+        printf ("\nTree->size = %d\n", treeDatabase->size);
+
         switch (mode)
         {
         case 'g':
@@ -42,7 +50,11 @@ int main (void)
     if (mode == 'e')
     {
         UpdateDatabase (treeDatabase);
-        SpeakAndPrint ("Bye! Come again!");
+        printf ("Bye! Come again!");
+    }
+    else
+    {
+        printf ("Bye! Come again!");
     }
 
     TreeDump (treeDatabase);
@@ -58,11 +70,11 @@ int SelectMode (void)
 {
     int mode = 0;
 
-    SpeakAndPrint ("Guess the character - [g]\n"
-                   "Get character definition - [d]\n"
-                   "Compare characters - [c]\n"
-                   "Exit the program by saving the changes - [e]\n"
-                   "Quit the program without saving - [q]\n");
+    printf ("Guess the character - [g]\n"
+            "Get character definition - [d]\n"
+            "Compare characters - [c]\n"
+            "Exit the program by saving the changes - [e]\n"
+            "Quit the program without saving - [q]\n");
     
     while ((mode = getchar ()) != EOF)
     {
@@ -70,7 +82,7 @@ int SelectMode (void)
 
         if (strchr ("gdceq", mode) == 0)
         {
-            SpeakAndPrint ("You have entered an incorrect symbol! Enter the symbol correctly!\n");
+            printf ("You have entered an incorrect symbol! Enter the symbol correctly!\n");
             continue;
         }
         else
@@ -206,8 +218,11 @@ int ReadTree (Text* database, tree_t* tree)
         }
         else if (strchr (database->lines[index].lineStart, '}'))
         {
-            currentNode = StackPop (&stk);
-            currentMode = RIGHT;
+            if (stk.size != 0)
+            {
+                currentNode = StackPop (&stk);
+                currentMode = RIGHT;
+            }
         }
         else
         {
@@ -216,7 +231,7 @@ int ReadTree (Text* database, tree_t* tree)
         }
     }
 
-    StackDtor (&stk);
+    StackDtor (&stk);    
 
     return 0;
 }
@@ -241,7 +256,7 @@ int AkinatorGuess (tree_t* tree)
     {
         StackPush (&stk, currentNode);
 
-        SpeakAndPrint ("Question: %s?. Enter [y] if the answer is YES or [n] if the answer is NO: ", currentNode->item);
+        printf ("Question: %s?. Enter [y] if the answer is YES or [n] if the answer is NO: ", currentNode->item);
 
         while ((userAns = getchar ()) != EOF)
         {
@@ -249,7 +264,7 @@ int AkinatorGuess (tree_t* tree)
 
             if (strchr ("yn", userAns) == nullptr)
             {
-                SpeakAndPrint ("Enter the symbols correctly! Enter [y] or [n]: ");
+                printf ("Enter the symbols correctly! Enter [y] or [n]: ");
             }
             else
             {
@@ -276,14 +291,14 @@ int AkinatorGuess (tree_t* tree)
 
     if (userAns == 'y')
     {
-        SpeakAndPrint ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n\n", currentNode->item);
+        printf ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n\n", currentNode->item);
 
         StackDtor (&stk);
 
         return 0;
     }
 
-    UpdateTempDatabase (currentNode);
+    UpdateTempDatabase (tree, currentNode);
 
     StackDtor (&stk);
 
@@ -351,7 +366,7 @@ int SaveTempData (node_t* root, FILE* stream, size_t tabCount)
 
 //=====================================================================================================================================
 
-int UpdateTempDatabase (node_t* currentNode)
+int UpdateTempDatabase (tree_t* treeDatabase, node_t* currentNode)
 {
     if (currentNode == nullptr)
     {
@@ -359,7 +374,7 @@ int UpdateTempDatabase (node_t* currentNode)
         return -1;
     }
 
-    SpeakAndPrint ("Damn, I lost! And who was it?\n");
+    printf ("Damn, I lost! And who was it?\n");
 
     char newCharacter[MaxSize] = "";
     fgets (newCharacter, MaxSize - 1, stdin);
@@ -373,7 +388,7 @@ int UpdateTempDatabase (node_t* currentNode)
     node_t* newLeft  = CreateNode (newCharacter);
     node_t* newRight = CreateNode (currentNode->item);
 
-    SpeakAndPrint ("How does %s differ from %s? Write an answer: ", newLeft->item, currentNode->item);
+    printf ("How does %s differ from %s? Write an answer: ", newLeft->item, currentNode->item);
 
     char difference[MaxSize] = "";
     fgets (difference, MaxSize - 1, stdin);
@@ -390,7 +405,9 @@ int UpdateTempDatabase (node_t* currentNode)
     currentNode->left = newLeft;
     currentNode->right = newRight;
 
-    SpeakAndPrint ("Ha ha! I've become smarter, leather bag!\n\n");
+    treeDatabase->size = treeDatabase->size + 1;
+
+    printf ("Ha ha! I've become smarter, leather bag!\n\n");
 
     return 0;
 }
@@ -470,6 +487,8 @@ int FindCharacter (char* character, tree_t* tree, node_t* node, size_t* count, s
     StackPop (stk);
     StackPop (stk);
 
+    *count = 0;
+
     if (node->right != nullptr) 
     {
         StackPush (stk, nullptr);
@@ -502,7 +521,7 @@ int DefineCharacter (tree_t* tree)
         return -1;
     }
 
-    SpeakAndPrint ("Who do you want to know about?: ");
+    printf ("Who do you want to know about?: ");
 
     char userCharacter[MaxSize] = "";
 
@@ -528,7 +547,7 @@ int DefineCharacter (tree_t* tree)
         break;
     
     case EMPTY:
-        SpeakAndPrint ("I do not know who this is!\n\n");
+        printf ("I do not know who this is!\n\n");
         break;
     
     default:
@@ -550,7 +569,7 @@ int PrintDefinition (stack_t* stk)
     StackPop (stk);
 
     node_t* character = StackPop (stk);
-    SpeakAndPrint ("%s is ", character->item);
+    printf ("%s is ", character->item);
 
     stack_t reverseStk = {};
     StackCtor (&reverseStk);
@@ -563,10 +582,10 @@ int PrintDefinition (stack_t* stk)
 
         if (StackPop (&reverseStk) == nullptr)
         {
-            SpeakAndPrint ("not ");
+            printf ("not ");
         }
 
-        SpeakAndPrint ("%s", currentNode->item);
+        printf ("%s", currentNode->item);
         
         if (reverseStk.size != 0)
         {
@@ -589,7 +608,7 @@ int CompareCharacters (tree_t* tree)
 {
     ASSERT (tree != nullptr);
 
-    SpeakAndPrint ("Enter the name of the first character: ");
+    printf ("Enter the name of the first character: ");
 
     char firstCharacter[MaxSize] = "";
     ReadCharacter (firstCharacter);
@@ -606,7 +625,7 @@ int CompareCharacters (tree_t* tree)
         return -1;
     }
 
-    SpeakAndPrint ("Enter the name of the second character: ");
+    printf ("Enter the name of the second character: ");
     char secondCharacter[MaxSize] = "";
     ReadCharacter (secondCharacter);
 
@@ -624,7 +643,7 @@ int CompareCharacters (tree_t* tree)
 
     bool common = 0;
 
-    SpeakAndPrint ("Common properties: ");
+    printf ("Common properties: ");
 
     while (firstDefinitions.size != 0 && secondDefinitions.size != 0)
     {
@@ -644,15 +663,15 @@ int CompareCharacters (tree_t* tree)
             common = 1;
 
             if (firstAns == nullptr)
-                SpeakAndPrint ("not ");
+                printf ("not ");
             
-            SpeakAndPrint ("%s", firstNode->item);
+            printf ("%s", firstNode->item);
         }
     }
 
     if (common == 0)
     {
-        SpeakAndPrint ("the characters do not have common properties. It is impossible to compare them!");
+        printf ("the characters do not have common properties. It is impossible to compare them!");
     }
 
     printf ("\n\n");
@@ -710,7 +729,7 @@ int FindDefinitions (char* character, tree_t* tree, node_t* node, stack_t* defin
     if (findResult != FOUND)
     {
         StackDtor (&temp);
-        SpeakAndPrint ("There is no such character in the database!\n");
+        printf ("There is no such character in the database!\n");
         return -1;
     }
 
@@ -726,23 +745,26 @@ int FindDefinitions (char* character, tree_t* tree, node_t* node, stack_t* defin
 
 //=====================================================================================================================================
 
-void SpeakAndPrint (const char* str...)
+int SpeakAndPrint (const char* str...)
 {
-    ASSERT (str != nullptr);
+    if (str == nullptr)
+    {
+        printf ("Error in function: %s. Condition: str != nullptr.", __func__);
+        return -1;
+    }
 
     va_list args = {0};
     va_start (args, str);
-
+    
     char message[MaxSize] = "";
 
     vsprintf (message, str, args);
 
     printf ("%s", message);
 
-    char cmd[MaxSize] = "";
+    txSpeak (message);
 
-    sprintf (cmd, ".\\eSpeak\\command_line\\espeak.exe \"%s\"", message);
-    system (cmd);
+    return 0;
 }
 
 //=====================================================================================================================================
