@@ -234,7 +234,7 @@ void TreeDump (tree_t* tree)
     fprintf (dotFile, "node [color=black, shape=box, style=\"rounded, filled\", fontname = \"Aqum\"];\n");
 
     fprintf (dotFile, "size [fillcolor=\"#FFD700\", "
-                     "label=\"SIZE = %u\"];\n",
+                     "label=\"SIZE = %llu\"];\n",
                       tree->size);
     
 	size_t nodeCount = 0;

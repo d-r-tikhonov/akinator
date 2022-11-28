@@ -23,8 +23,6 @@ int main (void)
 
     while ((mode = SelectMode ()) != 'q' && mode != 'e')
     {
-        printf ("\nTree->size = %d\n", treeDatabase->size);
-
         switch (mode)
         {
         case 'g':
