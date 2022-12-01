@@ -6,8 +6,8 @@
 
 void TextCtor (Text* text, FILE* const source)
 {
-    ASSERT (source != nullptr);
-    ASSERT (text   != nullptr);
+    ASSERT (source != nullptr, (void) -1);
+    ASSERT (text   != nullptr, (void) -1);
 
     ReadInBuffer (text, source);
 
@@ -18,8 +18,8 @@ void TextCtor (Text* text, FILE* const source)
 
 void ReadInBuffer (Text* text, FILE* source)
 {
-    ASSERT (text   != nullptr);
-    ASSERT (source != nullptr);
+    ASSERT (text   != nullptr, (void) -1);
+    ASSERT (source != nullptr, (void) -1);
     
     text->nChar = FileSize (source);
 
@@ -32,7 +32,7 @@ void ReadInBuffer (Text* text, FILE* source)
 
 size_t FileSize (FILE* stream)
 {
-    ASSERT (stream != nullptr);
+    ASSERT (stream != nullptr, 0);
 
 	size_t curPos = ftell (stream);
 
@@ -104,7 +104,7 @@ void CountInText (char* text, char search, size_t* count)
 
 void TextDtor(Text* text)
 {
-    ASSERT (text != nullptr);
+    ASSERT (text != nullptr, (void) -1);
 
     free (text->buffer); 
     free (text->lines);

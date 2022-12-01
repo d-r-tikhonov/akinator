@@ -14,7 +14,7 @@ static void clearTree (node_t* root);
 
 static void clearTree (node_t* root)
 {
-    ASSERT (root != nullptr);
+    ASSERT (root != nullptr, (void) -1);
 
     if (root->left != nullptr)
     {
@@ -33,7 +33,7 @@ static void clearTree (node_t* root)
 
 int TreeCtor (tree_t* tree)
 {
-    ASSERT (tree != nullptr);
+    ASSERT (tree != nullptr, -1);
 
     tree->root = nullptr;
     tree->size = 0;
@@ -51,7 +51,7 @@ int TreeCtor (tree_t* tree)
 
 int TreeDtor (tree_t* tree)
 {
-    ASSERT (tree != nullptr);
+    ASSERT (tree != nullptr, -1);
 
     if (tree->size != 0)
     {
@@ -74,12 +74,12 @@ int TreeDtor (tree_t* tree)
 bool isTreeEmpty (tree_t* tree)
 {
     if (tree == nullptr)
-        return 1;
+        return true;
     
     if (tree->root == nullptr && tree->size == 0)
-        return 1;
+        return true;
     
-    return 0;
+    return false;
 }
 
 //=====================================================================================================================================
@@ -87,9 +87,9 @@ bool isTreeEmpty (tree_t* tree)
 bool isTreeDestructed (tree_t* tree)
 {
     if (tree == nullptr && tree->size == DeadSize)
-        return 1;
+        return true;
     
-    return 0;
+    return false;
 }
 
 //=====================================================================================================================================
@@ -116,26 +116,26 @@ node_t* CreateNode (char* item)
 
 bool NodeRemove (tree_t* tree, node_t* node)
 {
-    ASSERT (tree != nullptr);
-    ASSERT (node != nullptr);
+    ASSERT (tree != nullptr, 1);
+    ASSERT (node != nullptr, 1);
 
     if (node->left != nullptr && node->right != nullptr)
     {
         clearTree (node);
         tree->size = tree->size - 1;
 
-        return 0;
+        return false;
     }
 
     printf ("Error in function: %s. The node is not destroyed!\n", __func__);
-    return 1; 
+    return true; 
 }
 
 //=====================================================================================================================================
 
 node_t* InsertNode (tree_t* tree, node_t* node, char* item, InsMode insMode)
 {
-    ASSERT (tree != nullptr);
+    ASSERT (tree != nullptr, nullptr);
 
     if (tree->size != 0 && node == nullptr && tree->root == nullptr)
     {
@@ -177,9 +177,9 @@ node_t* InsertNode (tree_t* tree, node_t* node, char* item, InsMode insMode)
 
 void NodeDump (tree_t* tree, node_t* node, size_t* nodeCount, FILE* file)
 {
-	ASSERT (tree != nullptr);
-    ASSERT (node != nullptr);
-    ASSERT (file != nullptr);
+	ASSERT (tree != nullptr, (void) -1);
+    ASSERT (node != nullptr, (void) -1);
+    ASSERT (file != nullptr, (void) -1);
 	
 	if (*nodeCount > tree->size) return;
 	
@@ -213,7 +213,7 @@ void NodeDump (tree_t* tree, node_t* node, size_t* nodeCount, FILE* file)
 
 void TreeDump (tree_t* tree)
 {   
-    ASSERT (tree != nullptr);
+    ASSERT (tree != nullptr, (void) -1);
 
     if (tree->size == 0)
     {

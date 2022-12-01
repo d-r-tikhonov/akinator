@@ -105,7 +105,7 @@ int SelectMode (void)
 tree_t* DataDownload (void)
 {
     FILE* dataFile = fopen ("akinator.database", "r");
-    ASSERT (dataFile != nullptr);
+    ASSERT (dataFile != nullptr, nullptr);
 
     tree_t* tree = (tree_t*) calloc (1, sizeof (tree_t));
     TreeCtor (tree);
@@ -133,11 +133,7 @@ tree_t* DataDownload (void)
 
 int CreateNodeItem (char* item, const char* data)
 {
-    if (item == nullptr || data == nullptr)
-    {
-        printf ("Error in function: %s. Null pointers to variables!\n", __func__);
-        return -1;
-    }
+    ASSERT (item != nullptr && data != nullptr, -1)
 
     const char* end = strchr (data, '"');
     if (end == nullptr)
@@ -155,18 +151,14 @@ int CreateNodeItem (char* item, const char* data)
 
 int ReadTree (Text* database, tree_t* tree)
 {
-    ASSERT (database != nullptr);
-    ASSERT (tree != nullptr);
+    ASSERT (database != nullptr, -1);
+    ASSERT (tree != nullptr, -1);
 
     stack_t stk = {};
     StackCtor (&stk);
 
     const char* open = strchr (database->lines[0].lineStart, '{');
-    if (open == nullptr)
-    {
-        printf ("Error in function: %s. Error in the database!\n", __func__);
-        return -1;
-    }
+    ASSERT (open != nullptr, -1);
 
     char item[MaxSize] = "";
 
@@ -240,21 +232,16 @@ int ReadTree (Text* database, tree_t* tree)
 
 int AkinatorGuess (tree_t* tree)
 {
-    if (tree == nullptr)
-    {
-        printf ("Error in function: %s. The pointer to the tree database is nullptr!\n", __func__);
-        return -1;
-    }
-
-    stack_t stk = {};
-    StackCtor (&stk);
+    ASSERT (tree != nullptr, -1);
 
     node_t* currentNode = tree->root;
     int userAns = 0;
 
+    node_t* answerNode = nullptr;
+
     while (currentNode != nullptr)
     {
-        StackPush (&stk, currentNode);
+        answerNode = currentNode;
 
         SpeakAndPrint ("Question: %s?. Enter [y] if the answer is YES or [n] if the answer is NO: ", currentNode->item);
 
@@ -273,7 +260,7 @@ int AkinatorGuess (tree_t* tree)
         }
 
         if (userAns == 'y')
-        {
+        {   
             currentNode = currentNode->left;
         }
         else if (userAns == 'n')
@@ -287,20 +274,14 @@ int AkinatorGuess (tree_t* tree)
         }
     }
 
-    currentNode = StackPop (&stk);
-
     if (userAns == 'y')
     {
-        SpeakAndPrint ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n\n", currentNode->item);
-
-        StackDtor (&stk);
+        SpeakAndPrint ("Ho-ho-ho! I've won again, leather bag! He/She/It is %s!\n\n", answerNode->item);
 
         return 0;
     }
 
     UpdateTempDatabase (tree, currentNode);
-
-    StackDtor (&stk);
 
     return 0;
 }
@@ -327,8 +308,8 @@ void ClearInputBuffer (void)
 
 int SaveTempData (node_t* root, FILE* stream, size_t tabCount)
 {
-    ASSERT (root != nullptr);
-    ASSERT (stream != nullptr);
+    ASSERT (root != nullptr, -1);
+    ASSERT (stream != nullptr, -1);
 
     for (size_t index = 0; index < tabCount; index++)
     {
@@ -368,22 +349,12 @@ int SaveTempData (node_t* root, FILE* stream, size_t tabCount)
 
 int UpdateTempDatabase (tree_t* treeDatabase, node_t* currentNode)
 {
-    if (currentNode == nullptr)
-    {
-        printf ("Error in function: %s. Condition:  currentNode == nullptr\n", __func__);
-        return -1;
-    }
+   ASSERT (currentNode != nullptr, -1);
 
-    SpeakAndPrint ("Damn, I lost! And who was it?\n");
+    SpeakAndPrint ("Damn, I lost! And who was it?\n"); 
 
     char newCharacter[MaxSize] = "";
-    fgets (newCharacter, MaxSize - 1, stdin);
-
-    size_t lastSymbol = strlen (newCharacter) - 1;
-    if (newCharacter[lastSymbol] == '\n')
-    {
-        newCharacter[lastSymbol] = '\0';
-    }
+    ReadCharacter (newCharacter);
 
     node_t* newLeft  = CreateNode (newCharacter);
     node_t* newRight = CreateNode (currentNode->item);
@@ -393,7 +364,7 @@ int UpdateTempDatabase (tree_t* treeDatabase, node_t* currentNode)
     char difference[MaxSize] = "";
     fgets (difference, MaxSize - 1, stdin);
 
-    lastSymbol = strlen (difference) - 1;
+    size_t lastSymbol = strlen (difference) - 1;
 
     if (difference[lastSymbol] == '\n')
     {
@@ -416,11 +387,7 @@ int UpdateTempDatabase (tree_t* treeDatabase, node_t* currentNode)
 
 int UpdateDatabase (tree_t* tree)
 {
-    if (tree == nullptr)
-    {
-        printf ("Error in function: %s. Condition: tree == nullptr!\n", __func__);
-        return -1;
-    }
+    ASSERT (tree != nullptr, -1);
 
     FILE* dataBase = fopen ("akinator.database", "w");
     if (dataBase == nullptr)
@@ -444,13 +411,13 @@ int UpdateDatabase (tree_t* tree)
 
 int FindCharacter (char* character, tree_t* tree, node_t* node, size_t* count, stack_t* stk)
 {
-    ASSERT (character   != nullptr);
-    ASSERT (tree        != nullptr);
-    ASSERT (node        != nullptr);
-    ASSERT (count       != nullptr);
-    ASSERT (stk         != nullptr);
+    ASSERT (character   != nullptr, -1);
+    ASSERT (tree        != nullptr, -1);
+    ASSERT (node        != nullptr, -1);
+    ASSERT (count       != nullptr, -1);
+    ASSERT (stk         != nullptr, -1);
 
-    ASSERT (*count < tree->size);
+    ASSERT (*count < tree->size, -1);
 
     *count = *count + 1;
 
@@ -515,11 +482,7 @@ int FindCharacter (char* character, tree_t* tree, node_t* node, size_t* count, s
 
 int DefineCharacter (tree_t* tree)
 {
-    if (tree == nullptr)
-    {
-        printf ("Error in function: %s. Condition: tree == nullptr!\n", __func__);
-        return -1;
-    }
+    ASSERT (tree != nullptr, -1);
 
     SpeakAndPrint ("Who do you want to know about?: ");
 
@@ -564,12 +527,12 @@ int DefineCharacter (tree_t* tree)
 
 int PrintDefinition (stack_t* stk)
 {
-    ASSERT (stk != nullptr);
+    ASSERT (stk != nullptr, -1);
 
     StackPop (stk);
 
     node_t* character = StackPop (stk);
-    printf ("%s is ", character->item);
+    SpeakAndPrint ("%s is ", character->item);
 
     stack_t reverseStk = {};
     StackCtor (&reverseStk);
@@ -582,10 +545,10 @@ int PrintDefinition (stack_t* stk)
 
         if (StackPop (&reverseStk) == nullptr)
         {
-            printf ("not ");
+            SpeakAndPrint ("not ");
         }
 
-        printf ("%s", currentNode->item);
+        SpeakAndPrint ("%s", currentNode->item);
         
         if (reverseStk.size != 0)
         {
@@ -606,7 +569,7 @@ int PrintDefinition (stack_t* stk)
 
 int CompareCharacters (tree_t* tree)
 {
-    ASSERT (tree != nullptr);
+    ASSERT (tree != nullptr, -1);
 
     SpeakAndPrint ("Enter the name of the first character: ");
 
@@ -665,7 +628,7 @@ int CompareCharacters (tree_t* tree)
             if (firstAns == nullptr)
                 SpeakAndPrint ("not ");
             
-            printf ("%s", firstNode->item);
+            SpeakAndPrint ("%s", firstNode->item);
         }
     }
 
@@ -686,7 +649,7 @@ int CompareCharacters (tree_t* tree)
 
 int ReadCharacter (char* character)
 {
-    ASSERT (character != nullptr);
+    ASSERT (character != nullptr, -1);
 
     fgets (character, MaxSize - 1, stdin);
 
@@ -701,24 +664,12 @@ int ReadCharacter (char* character)
 
 //=====================================================================================================================================
 
-int ReverseStack (stack_t* reverseStk, stack_t* tempStk)
-{
-    while (tempStk->size != 0)
-    {
-        StackPush (reverseStk, StackPop (tempStk));
-    }
-
-    return 0;
-}
-
-//=====================================================================================================================================
-
 int FindDefinitions (char* character, tree_t* tree, node_t* node, stack_t* definitions)
 {
-    ASSERT (character       != nullptr);
-    ASSERT (tree            != nullptr);
-    ASSERT (node            != nullptr);
-    ASSERT (definitions     != nullptr);
+    ASSERT (character       != nullptr, -1);
+    ASSERT (tree            != nullptr, -1);
+    ASSERT (node            != nullptr, -1);
+    ASSERT (definitions     != nullptr, -1);
 
     stack_t temp = {};
     StackCtor (&temp);
@@ -747,11 +698,7 @@ int FindDefinitions (char* character, tree_t* tree, node_t* node, stack_t* defin
 
 int SpeakAndPrint (const char* str...)
 {
-    if (str == nullptr)
-    {
-        printf ("Error in function: %s. Condition: str != nullptr.", __func__);
-        return -1;
-    }
+    ASSERT (str != nullptr, -1);
 
     va_list args = {0};
     va_start (args, str);

@@ -44,11 +44,12 @@ struct stack_t
 
 //=====================================================================================================================================
 
-void 	StackCtor 	(stack_t* const stk);
-void 	StackPush 	(stack_t* stk, const elem_t item);
-elem_t 	StackPop 	(stack_t* const stk);
-void 	StackDtor 	(stack_t* const stk);
-void 	StackDump 	(stack_t* const stk);
+void 	StackCtor 		(stack_t* const stk);
+void 	StackPush 		(stack_t* stk, const elem_t item);
+elem_t 	StackPop 		(stack_t* const stk);
+void 	StackDtor 		(stack_t* const stk);
+void 	StackDump 		(stack_t* const stk);
+int     ReverseStack 	(stack_t* reverseStk, stack_t* tempStk);
 
 //=====================================================================================================================================
 

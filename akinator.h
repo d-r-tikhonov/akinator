@@ -38,7 +38,6 @@ int         PrintDefinition     (stack_t* stk);
 int         DefineCharacter     (tree_t* tree);
 int         FindCharacter       (char* character, tree_t* tree, node_t* node, size_t* count, stack_t* stk);
 int         CompareCharacters   (tree_t* tree);
-int         ReverseStack        (stack_t* reverseStk, stack_t* tempStk);
 int         ReadCharacter       (char* character);
 int         FindDefinitions     (char* character, tree_t* tree, node_t* node, stack_t* definitions);
 int         SpeakAndPrint       (const char* str...);
